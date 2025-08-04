@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Weather Data</title>
+</head>
+<body>
+    <h1>Weather Data for <span th:text="${cityName}"></span></h1>
+    <form method="post" th:action="@{'/average-weather/' + ${cityName}}">
+        <label for="city">Search City:</label>
+        <input type="text" name="cityName" id="city" placeholder="Type city name..." value="" />
+        <button type="submit">Search</button>
+    </form>
+    <br>
+    <form method="post" th:action="@{'/average-weather/' + ${cityName}}">
+        <label for="cityDropdown">Or select from list:</label>
+        <select name="cityName" id="cityDropdown">
+            <option th:each="city : ${cities}" th:value="${city.city}" th:text="${city.city}" th:selected="${city.city == cityName}"></option>
+        </select>
+        <button type="submit">Show Weather</button>
+    </form>
+    <div th:if="${error}">
+        <p style="color: red;" th:text="${error}"></p>
+    </div>
+    <p>Average Temperature: <span th:text="${averageTemperature}"></span> °C</p>
+    <table style="border-collapse: collapse; width: 50%;">
+        <tr>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Time</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Temperature (°C)</th>
+        </tr>
+        <tr th:each="i : ${#numbers.sequence(0, formattedTimes.size() - 1)}">
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;" th:text="${formattedTimes[i]}"></td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" th:text="${formattedTemps[i]}"></td>
+        </tr>
+    </table>
+</body>
+</html>
