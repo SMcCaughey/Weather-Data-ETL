@@ -1,4 +1,5 @@
--- Create airport_weather_forecast table with correct case for H2
+-- Drop the lowercase table and recreate with correct case
+DROP TABLE IF EXISTS airport_weather_forecast;
 CREATE TABLE AIRPORT_WEATHER_FORECAST (
     ID BIGINT AUTO_INCREMENT PRIMARY KEY,
     CITY_NAME VARCHAR(50) NOT NULL,
