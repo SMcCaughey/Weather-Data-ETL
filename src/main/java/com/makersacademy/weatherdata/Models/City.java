@@ -16,4 +16,3 @@ public class City {
     private long population;
     private long population_proper;
 }
-

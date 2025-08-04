@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Select Airport - <span th:text="${cityName}"></span></title>
+    <style>
+        .nav-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .airport-card {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-section">
+        <h2>✈️ Airport Selection for <span th:text="${cityName}"></span></h2>
+        <p><strong>Multiple airports found.</strong> Choose which airport's data you want to view:</p>
+        <div>
+            <form method="get" action="/airport-weather" style="display: inline; margin: 10px;">
+                <input type="text" name="airportName" placeholder="Search forecast history..." style="padding: 8px;" />
+                <button type="submit" class="btn btn-secondary">📊 Search Stored Forecasts</button>
+            </form>
+            <a href="/" class="btn btn-secondary">🏠 Back to Homepage</a>
+        </div>
+    </div>
+
+    <h1>Select Airport in <span th:text="${cityName}"></span></h1>
+    <p><span th:text="${cityName}"></span> has <span th:text="${airports.size()}"></span> airports. Please select which airport's weather conditions you'd like to view:</p>
+
+    <div style="margin: 20px 0;">
+        <div th:each="airport : ${airports}" class="airport-card">
+            <h3><span th:text="${airport.name}"></span> Airport (<span th:text="${airport.iataCode}"></span>)</h3>
+            <p><strong>Location:</strong> <span th:text="${airport.city}"></span>, <span th:text="${airport.country}"></span></p>
+            <p><strong>Coordinates:</strong> <span th:text="${#numbers.formatDecimal(airport.latDecimal, 1, 4)}"></span>°N, <span th:text="${#numbers.formatDecimal(airport.lonDecimal, 1, 4)}"></span>°W</p>
+            <div style="margin-top: 10px;">
+                <a th:href="@{'/average-weather/' + ${cityName} + '?airportName=' + ${airport.name}}"
+                   class="btn btn-success">
+                    🌤️ View Live Weather at <span th:text="${airport.name}"></span>
+                </a>
+                <a th:href="@{'/airport-weather/' + ${airport.name}}"
+                   class="btn btn-secondary">
+                    📊 View Forecast History
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-section">
+        <h3>🔍 Search Other Cities</h3>
+        <form method="post" th:action="@{'/average-weather/' + ${cityName}}" style="display: inline-block; margin: 10px;">
+            <label for="city">Search City:</label>
+            <input type="text" name="cityName" id="city" placeholder="Type city name..." value="" style="padding: 8px;" />
+            <button type="submit" class="btn">🌍 Find Airports</button>
+        </form>
+
+        <form method="post" th:action="@{'/average-weather/' + ${cityName}}" style="display: inline-block; margin: 10px;">
+            <label for="cityDropdown">Or select from list:</label>
+            <select name="cityName" id="cityDropdown" style="padding: 8px;">
+                <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${city == cityName}"></option>
+            </select>
+            <button type="submit" class="btn">✈️ Show Airports</button>
+        </form>
+    </div>
+</body>
+</html>

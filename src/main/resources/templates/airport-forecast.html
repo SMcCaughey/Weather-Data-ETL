@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Airport Weather Forecast History</title>
+    <style>
+        .nav-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-primary {
+            background-color: #28a745;
+        }
+        .btn-primary:hover {
+            background-color: #1e7e34;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-section">
+        <h2>📊 Stored Airport Forecast Data</h2>
+        <p><strong>Currently viewing:</strong> Historical forecast records from database</p>
+        <div th:if="${airportName}">
+            <!-- Try to find the city for this airport to create live weather link -->
+            <a th:href="@{'/average-weather/London?airportName=' + ${airportName}}" class="btn btn-primary">
+                🌤️ View Live Weather for <span th:text="${airportName}"></span>
+            </a>
+        </div>
+        <div>
+            <form method="get" action="/airport-weather" style="display: inline; margin: 10px;">
+                <input type="text" name="airportName" placeholder="Search another airport..." style="padding: 8px;" />
+                <button type="submit" class="btn btn-secondary">🔍 Search Forecast History</button>
+            </form>
+            <a href="/" class="btn btn-secondary">🏠 Back to Live Weather Home</a>
+        </div>
+    </div>
+
+    <h1>Stored Weather Forecast Data for <span th:text="${airportName}"></span> Airport</h1>
+
+    <div th:if="${forecasts != null && !forecasts.empty}">
+        <p><em>This data shows previously recorded weather forecasts for this airport location.</em></p>
+        <div class="nav-section">
+            <p><strong>📈 Total Records Found:</strong> <span th:text="${forecasts.size()}"></span></p>
+        </div>
+        <table style="border-collapse: collapse; width: 90%;">
+            <tr>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;">City</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;">Airport</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;">Forecast Start Date</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;">Forecast End Date</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #f2f2f2;">Average Temperature (°C)</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #f2f2f2;">Actions</th>
+            </tr>
+            <tr th:each="forecast : ${forecasts}">
+                <td style="border: 1px solid #ddd; padding: 8px;" th:text="${forecast.cityName}"></td>
+                <td style="border: 1px solid #ddd; padding: 8px;" th:text="${forecast.airportName}"></td>
+                <td style="border: 1px solid #ddd; padding: 8px;" th:text="${forecast.startDate}"></td>
+                <td style="border: 1px solid #ddd; padding: 8px;" th:text="${forecast.endDate}"></td>
+                <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" th:text="${#numbers.formatDecimal(forecast.averageTemperature, 1, 1)}"></td>
+                <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                    <a th:href="@{'/average-weather/' + ${forecast.cityName} + '?airportName=' + ${forecast.airportName}}"
+                       class="btn" style="font-size: 12px; padding: 4px 8px;">
+                        🌤️ Get New Live Data
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div th:if="${forecasts == null || forecasts.empty}">
+        <div class="nav-section">
+            <h3>📭 No Stored Forecast Data</h3>
+            <p>No stored forecast data available for this airport yet.</p>
+            <p><em>Weather forecast data is automatically saved when you view live airport conditions.</em></p>
+            <div>
+                <a href="/average-weather/London" class="btn btn-primary">🌤️ Get Live Weather Data</a>
+                <a href="/" class="btn btn-secondary">🏠 Return to Homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-section">
+        <h3>🔍 Quick Navigation</h3>
+        <a href="/average-weather/London" class="btn">London Airports</a>
+        <a href="/average-weather/Manchester" class="btn">Manchester Airport</a>
+        <a href="/average-weather/Birmingham" class="btn">Birmingham Airport</a>
+        <a href="/average-weather/Glasgow" class="btn">Glasgow Airport</a>
+    </div>
+</body>
+</html>

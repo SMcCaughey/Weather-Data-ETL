@@ -1,36 +1,113 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Weather Data</title>
+    <title>Airport Weather Conditions</title>
+    <style>
+        .nav-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+    </style>
 </head>
 <body>
-    <h1>Weather Data for <span th:text="${cityName}"></span></h1>
-    <form method="post" th:action="@{'/average-weather/' + ${cityName}}">
-        <label for="city">Search City:</label>
-        <input type="text" name="cityName" id="city" placeholder="Type city name..." value="" />
-        <button type="submit">Search</button>
-    </form>
-    <br>
-    <form method="post" th:action="@{'/average-weather/' + ${cityName}}">
-        <label for="cityDropdown">Or select from list:</label>
-        <select name="cityName" id="cityDropdown">
-            <option th:each="city : ${cities}" th:value="${city.city}" th:text="${city.city}" th:selected="${city.city == cityName}"></option>
-        </select>
-        <button type="submit">Show Weather</button>
-    </form>
+    <div class="nav-section">
+        <h2>🌤️ Live Airport Weather Data</h2>
+        <p><strong>Currently viewing:</strong> Real-time weather conditions</p>
+        <div>
+            <form method="get" th:action="@{'/airport-weather/' + ${airportName}}" style="display: inline;">
+                <button type="submit" class="btn btn-success">📊 View Stored Forecast History for <span th:text="${airportName}"></span></button>
+            </form>
+            <form method="get" action="/airport-weather" style="display: inline;">
+                <input type="text" name="airportName" placeholder="Enter airport name..." style="padding: 8px; margin: 5px;" />
+                <button type="submit" class="btn btn-secondary">🔍 Search Forecast History</button>
+            </form>
+        </div>
+    </div>
+
+    <h1>Airport Weather Conditions for <span th:text="${airportName}"></span> Airport</h1>
+    <p><strong>Airport:</strong> <span th:text="${airportName}"></span> (<span th:text="${airportCode}"></span>)</p>
+    <p><strong>City:</strong> <span th:text="${cityName}"></span></p>
+
+    <!-- Show other airports if multiple exist for this city -->
+    <div th:if="${airports != null && airports.size() > 1}" style="margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+        <p><strong>Other airports in <span th:text="${cityName}"></span>:</strong></p>
+        <span th:each="airport, iterStat : ${airports}">
+            <a th:if="${airport.name != airportName}"
+               th:href="@{'/average-weather/' + ${cityName} + '?airportName=' + ${airport.name}}"
+               class="btn btn-secondary"
+               th:text="${airport.name}"></a>
+        </span>
+    </div>
+
+    <div class="nav-section">
+        <h3>🔍 Search for More Cities/Airports</h3>
+        <form method="post" th:action="@{'/average-weather/' + ${cityName}}" style="display: inline-block; margin: 10px;">
+            <label for="city">Search City:</label>
+            <input type="text" name="cityName" id="city" placeholder="Type city name..." value="" style="padding: 8px;" />
+            <button type="submit" class="btn">🌍 Get Live Weather</button>
+        </form>
+
+        <form method="post" th:action="@{'/average-weather/' + ${cityName}}" style="display: inline-block; margin: 10px;">
+            <label for="cityDropdown">Or select from list:</label>
+            <select name="cityName" id="cityDropdown" style="padding: 8px;">
+                <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${city == cityName}"></option>
+            </select>
+            <button type="submit" class="btn">🌤️ Show Live Airport Weather</button>
+        </form>
+    </div>
+
     <div th:if="${error}">
         <p style="color: red;" th:text="${error}"></p>
     </div>
-    <p>Average Temperature: <span th:text="${averageTemperature}"></span> °C</p>
-    <table style="border-collapse: collapse; width: 50%;">
+
+    <div style="margin: 20px 0; padding: 15px; background-color: #e8f4fd; border-radius: 5px;">
+        <h3>📈 Current Week Weather Conditions (Live Data)</h3>
+        <p><strong>Average Temperature at <span th:text="${airportName}"></span> Airport:</strong> <span th:text="${averageTemperature}"></span> °C</p>
+        <p><em>Data shows hourly weather conditions recorded at the airport location</em></p>
+    </div>
+
+    <h3>📊 Hourly Temperature Readings</h3>
+    <table style="border-collapse: collapse; width: 70%;">
         <tr>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Time</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Temperature (°C)</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;">Time</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #f2f2f2;">Temperature (°C)</th>
         </tr>
         <tr th:each="i : ${#numbers.sequence(0, formattedTimes.size() - 1)}">
             <td style="border: 1px solid #ddd; padding: 8px; text-align: left;" th:text="${formattedTimes[i]}"></td>
             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;" th:text="${formattedTemps[i]}"></td>
         </tr>
     </table>
+
+    <div style="margin-top: 20px;">
+        <p><small><em>Weather data is sourced from the specific coordinates of <span th:text="${airportName}"></span> Airport, providing accurate conditions for aviation and travel planning.</em></small></p>
+    </div>
 </body>
 </html>
